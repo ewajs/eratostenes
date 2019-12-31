@@ -1,0 +1,1 @@
+-- Table declaration goes here

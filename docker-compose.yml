@@ -1,0 +1,28 @@
+version: "3.3"
+
+services:
+  db:
+    image: mysql:8
+    volumes:
+      - ./db/.data:/var/lib/mysql
+    restart: always
+    environment:
+      - MYSQL_DATABASE
+      - MYSQL_USER
+      - MYSQL_PASSWORD
+  app:
+    image: ewajs/eratostenes:latest
+    build:
+      context: ./app
+    volumes:
+      - ./app/src:/app/src
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - "80:80"
+    environment:
+      - MYSQL_DATABASE
+      - MYSQL_USER
+      - MYSQL_PASSWORD
+      - DATABASE_HOST
