@@ -1,8 +1,8 @@
-from flask import render_template, redirect, flash
+from flask import jsonify, render_template, redirect
 from eratostenes.forms import LoginForm
 from eratostenes import app
 from eratostenes import db
-from eratostenes.models import User, Author, Quote
+from eratostenes.models import User, Book, Author, Quote
 
 
 @app.route('/')
@@ -12,17 +12,26 @@ def index():
 
 @app.route('/user')
 def user():
-    return repr(User)
+    users = User.query.get(5)
+    return users.Username
 
 
 @app.route('/author')
 def author():
-    return repr(Author)
+    return jsonify(Author.query.all())
 
 
 @app.route('/quote')
 def quote():
-    return repr(Quote)
+    return jsonify(Quote.query.all())
+
+
+@app.route('/book')
+def book():
+    books = []
+    for book in Book.query.all():
+        books.append(book.to_dict())
+    return jsonify(books)
 
 
 @app.route("/login", methods=['GET', 'POST'])
