@@ -10,6 +10,11 @@ services:
       - MYSQL_DATABASE
       - MYSQL_USER
       - MYSQL_PASSWORD
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 30s
+      timeout: 20s
+      retries: 10
   app:
     image: ewajs/eratostenes:latest
     build:
@@ -19,6 +24,8 @@ services:
     restart: always
     depends_on:
       - db
+    links:
+      - db
     ports:
       - "80:80"
     environment:
@@ -26,3 +33,4 @@ services:
       - MYSQL_USER
       - MYSQL_PASSWORD
       - DATABASE_HOST
+      - SQLALCHEMY_TRACK_MODIFICATIONS

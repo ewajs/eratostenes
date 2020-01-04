@@ -1,3 +1,5 @@
 cryptography
 flask
+flask-sqlalchemy
+flask-wtf
 pymysql
