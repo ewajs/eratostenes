@@ -7,7 +7,7 @@ class Config(object):
     DB_USER = getenv('MYSQL_USER')
     DB_PASS = getenv('MYSQL_PASSWORD')
     DB_NAME = getenv('MYSQL_DATABASE')
-    SECRET_KEY = os.urandom(32)
+    SECRET_KEY = getenv('SECRET_KEY')
     SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://' + getenv('MYSQL_USER') + ':' + \
         getenv('MYSQL_PASSWORD') + '@' + getenv('DATABASE_HOST') + \
         '/' + getenv('MYSQL_DATABASE')
