@@ -2,7 +2,7 @@ import crypt
 from eratostenes.forms import LoginForm
 from eratostenes import app
 from eratostenes import db
-from eratostenes.models import User, Book, Author, Quote
+from eratostenes.models import User, Book, Author, Quote, BookAuthor
 from flask import flash, jsonify, render_template, redirect, request, session, url_for
 from sqlalchemy.sql import func
 from functools import wraps
@@ -27,19 +27,33 @@ def requires_auth(f):
             return f(*args, **kws)
     return decorated_function
 
+
+def elapsed_time(f):
+    """For testing purposes"""
+    @wraps(f)
+    def decorated_function(*args, **kws):
+        import time
+        start_time = time.time()
+        rtn = f(*args, **kws)
+        elapsed = time.time() - start_time
+        app.logger.info("Elapsed: " + str(elapsed))
+        return rtn
+    return decorated_function
+
 #######################################################################
 # Functions
 #######################################################################
 
 
+@elapsed_time
 def get_user_stats(user_id):
-    data = User.query.with_entities(
-        User.UserID, func.count(Author.AuthorID.distinct()), func.count(Book.BookID.distinct()), func.count(Quote.QuoteID.distinct())).filter(
-        User.UserID == user_id).join(
-        Author, User.UserID == Author.UserID).join(
-        Book, User.UserID == Book.UserID).join(
-        Quote, Quote.UserID == User.UserID).group_by(User.UserID).first()
-    return {'Authors': data[1], 'Books': data[2], 'Quotes': data[3]}
+    authors = Author.query.with_entities(
+        Author.AuthorID.distinct()).filter(Author.UserID == user_id).count()
+    books = Book.query.with_entities(Book.BookID.distinct()).filter(
+        Book.UserID == user_id).count()
+    quotes = Quote.query.with_entities(Quote.QuoteID.distinct()).filter(
+        Quote.UserID == user_id).count()
+    return {'Authors': authors, 'Books': books, 'Quotes': quotes}
 
 
 def get_random_quote(user_id):
