@@ -1,5 +1,6 @@
 {% extends "base.html" %} {% block content %}
 
+<a id="page-top"></a>
 <!-- Page Wrapper -->
 <div id="wrapper">
   <!-- Sidebar -->
@@ -97,13 +98,140 @@
         <div class="row">
           <!-- Content Column -->
           <div class="col mb-4">
-            <!-- Project Card Example -->
+            <!-- Random Quote Dropdown Card -->
             <div class="card shadow mb-4">
-              <div class="card-header py-3">
+              <!-- Card Header - Dropdown -->
+              <div
+                class="card-header py-3 d-flex flex-row align-items-center justify-content-between"
+              >
                 <h6 class="m-0 font-weight-bold text-primary">Random Quote</h6>
+                <div class="dropdown no-arrow">
+                  <a
+                    class="dropdown-toggle"
+                    href="#"
+                    role="button"
+                    id="quoteDropdown"
+                    data-toggle="dropdown"
+                    aria-haspopup="true"
+                    aria-expanded="false"
+                  >
+                    <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                  </a>
+                  <div
+                    class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
+                    aria-labelledby="quoteDropdown"
+                  >
+                    <div class="dropdown-header">Actions</div>
+                    <a class="dropdown-item" href="#"
+                      ><i class="fas fa-user-edit text-gray-300"></i>
+                      &nbsp;<span>Show Author</span></a
+                    >
+                    <a class="dropdown-item" href="#"
+                      ><i class="fas fa-book text-gray-300"></i> &nbsp;<span>
+                        Show Book</span
+                      ></a
+                    >
+
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="#"
+                      ><i class="fas fa-share-alt text-gray-300"></i>
+                      &nbsp;<span>Share</span
+                      ><span class="badge badge-danger badge-counter"
+                        >Coming soon!</span
+                      ></a
+                    >
+                  </div>
+                </div>
               </div>
+              <!-- Card Body -->
               <div class="card-body">
-                {{ quote.QuoteText|safe }}
+                <div class="card border-left-erat shadow h-100 py-2 mb-4">
+                  <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                      <div class="col mr-2">
+                        <div
+                          class="text-xs font-weight-bold text-erat text-uppercase mb-1"
+                        >
+                          {{ make_author_list(quote.Book.Author) | safe }} - {{
+                          quote.Book.Title }}
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                          {{ quote.QuoteText | safe}}
+                        </div>
+                      </div>
+                      <div class="col-auto">
+                        <i class="fas fa-quote-left fa-2x text-gray-300"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- Content Row -->
+                <div class="row">
+                  <!-- Books Card -->
+                  <div class="col-xl-6 col-md-6 mb-4">
+                    <div class="card border-left-success shadow h-100 py-2">
+                      <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                          <div class="col mr-2">
+                            <div
+                              class="text-xs font-weight-bold text-success text-uppercase mb-1"
+                            >
+                              Book
+                            </div>
+                            <div
+                              class="h5 mb-0 mx-3 d-flex justify-content-center"
+                            >
+                              <a href="/book/{{ quote.Book.BookID }}">
+                                <img
+                                  class="img-profile img-erat-thumb rounded-lg"
+                                  src="{{ url_for('static', filename='img/covers/'+ quote.Book.CoverPath)}}"
+                                  data-toggle="tooltip"
+                                  data-placement="top"
+                                  title="{{ quote.Book.Title }}"
+                                />
+                              </a>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Authors Card -->
+                  <div class="col-xl-6 col-md-6 mb-4">
+                    <div class="card border-left-primary shadow h-100 py-2">
+                      <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                          <div class="col mr-2">
+                            <div
+                              class="text-xs font-weight-bold text-primary text-uppercase mb-1"
+                            >
+                              Authors
+                            </div>
+                            <div class="h5 d-flex justify-content-center">
+                              {% for author in quote.Book.Author %}
+                              <a
+                                href="/author/{{ author.AuthorID }}"
+                                class="mx-2"
+                              >
+                                <img
+                                  class="img-profile img-erat-thumb rounded-lg"
+                                  src="{{ url_for('static', filename='img/authors/'+ author.PicturePath )}}"
+                                  data-toggle="tooltip"
+                                  data-placement="top"
+                                  title="{{ author.FirstName }} {{ author.LastName }}"
+                                />
+                              </a>
+                              {% endfor %}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Content Row -->
               </div>
             </div>
           </div>
@@ -166,5 +294,13 @@
     </div>
   </div>
 </div>
+
+{% endblock %} {% block script %}
+
+<script>
+  $(function() {
+    $('[data-toggle="tooltip"]').tooltip();
+  });
+</script>
 
 {% endblock %}

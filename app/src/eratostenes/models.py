@@ -15,12 +15,21 @@ class Author(db.Model):
     UserID = db.Column(db.Integer, nullable=False)
 
 
-class BookAuthor(db.Model):
-    __tablename__ = 'BookAuthor'
+# class BookAuthor(db.Model):
+#     __tablename__ = 'BookAuthor'
 
-    BookID = db.Column(db.Integer, primary_key=True, nullable=False)
-    AuthorID = db.Column(db.Integer, primary_key=True,
-                         nullable=False, index=True)
+#     BookID = db.Column(db.Integer, primary_key=True, nullable=False)
+#     AuthorID = db.Column(db.Integer, primary_key=True,
+#                          nullable=False, index=True)
+
+t_BookAuthor = db.Table(
+    'BookAuthor', db.metadata,
+    db.Column('AuthorID', db.ForeignKey('Author.AuthorID'),
+              primary_key=True, nullable=False),
+    db.Column('BookID', db.ForeignKey('Book.BookID'),
+              primary_key=True, nullable=False, index=True),
+    db.Index('AuthorID', 'AuthorID', 'BookID', unique=True)
+)
 
 
 class Country(db.Model):
@@ -68,6 +77,7 @@ class Book(db.Model):
     User = db.relationship('User', primaryjoin='Book.UserID == User.UserID')
     User1 = db.relationship('User', primaryjoin='Book.UserID == User.UserID')
     Genre = db.relationship('Genre', secondary='BookGenre')
+    Author = db.relationship('Author', secondary='BookAuthor')
 
     def to_dict(self):
         return {'BookID': self.BookID,

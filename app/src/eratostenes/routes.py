@@ -2,7 +2,7 @@ import crypt
 from eratostenes.forms import LoginForm
 from eratostenes import app
 from eratostenes import db
-from eratostenes.models import User, Book, Author, Quote, BookAuthor
+from eratostenes.models import User, Book, Author, Quote
 from flask import flash, jsonify, render_template, redirect, request, session, url_for
 from sqlalchemy.sql import func
 from functools import wraps
@@ -45,7 +45,6 @@ def elapsed_time(f):
 #######################################################################
 
 
-@elapsed_time
 def get_user_stats(user_id):
     authors = Author.query.with_entities(
         Author.AuthorID.distinct()).filter(Author.UserID == user_id).count()
@@ -57,9 +56,15 @@ def get_user_stats(user_id):
 
 
 def get_random_quote(user_id):
-    data = Quote.query.filter(
-        User.UserID == user_id).order_by(func.rand()).first()
+    data = Quote.query.filter(Quote.UserID == user_id).order_by(
+        func.rand()).limit(1).one()
+
+    # data = Quote.query.filter(
+    #     Quote.Book == Book.query.filter(
+    #         Book.Title == 'Journey to the Ants').one()).order_by(func.rand()).limit(1).one()
+   # Quote.UserID == user_id).order_by(func.rand()).limit(1).one()
     return data
+
 
 #######################################################################
 # Routes
@@ -72,6 +77,7 @@ def index():
     user_id = session['user']['UserID']
     user_data = get_user_stats(user_id)
     quote = get_random_quote(user_id)
+
     return render_template("index.html", title="Home", username=session['user']['Username'], user_data=user_data, quote=quote)
 
 

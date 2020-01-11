@@ -3,3 +3,4 @@
 db/.data/*
 __pycache__
 venv
+app/src/eratostenes/static/img

@@ -5,3 +5,9 @@
 .text-erat {
   color: #6747ad !important;
 }
+
+.img-erat-thumb {
+  height: 175px !important;
+  width: auto !important;
+  object-fit: cover;
+}
