@@ -11,9 +11,10 @@ class Author(db.Model):
     Bio = db.Column(db.Text)
     PicturePath = db.Column(db.String(255))
     Notes = db.Column(db.Text)
-    CountryID = db.Column(db.Integer)
+    CountryID = db.Column(db.ForeignKey('Country.CountryID'))
     UserID = db.Column(db.Integer, nullable=False)
 
+    Country = db.relationship('Country')
     Book = db.relationship('Book', secondary='BookAuthor')
 
     def Books(self):

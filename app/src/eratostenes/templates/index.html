@@ -103,7 +103,7 @@
             aria-labelledby="quoteDropdown"
           >
             <div class="dropdown-header">Actions</div>
-            <a class="dropdown-item" href="authors/{{ quote.Book.BookID }}"
+            <a class="dropdown-item" href="quote/{{ quote.QuoteID }}/authors"
               ><i class="fas fa-user-edit text-gray-300"></i> &nbsp;<span
                 >Show Author</span
               ></a
@@ -190,7 +190,7 @@
                     <div
                       class="text-xs font-weight-bold text-primary text-uppercase mb-1"
                     >
-                      Authors
+                      Author{% if quote.Book.Authors() > 1 %}s{% endif %}
                     </div>
                     <div class="h5 d-flex justify-content-center">
                       {% for author in quote.Book.Author %}
