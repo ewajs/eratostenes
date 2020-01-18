@@ -83,26 +83,42 @@ def index():
 
     return render_template("index.html", title="Home", username=session['user']['Username'], user_data=user_data, quote=quote)
 
+#######################################################################
+#    User
+#######################################################################
+
 
 @app.route('/user')
 def user_route():
     users = User.query.filter(User.Username == "ewajs").first()
     return users.Email
 
-########################################
 
+#######################################################################
+#    Author Subroutes
+#######################################################################
+
+#######################################################################
+#       Author by ID
+#######################################################################
 
 @app.route('/author/<int:author_id>')
 @requires_auth
 def author_route(author_id):
+    """Renders Author with AuthorID equal to author_id"""
     author = Author.query.filter((Author.AuthorID == author_id) & (
         Author.UserID == session['user']['UserID'])).one()
     return render_template('author.html', title=author.FullName, author=author)
 
 
+#######################################################################
+#       Books of Author by ID
+#######################################################################
+
 @app.route('/author/<int:author_id>/books')
 @requires_auth
 def author_book_route(author_id):
+    """Renders Books of Author with AuthorID equal to author_id"""
     author = Author.query.filter((Author.AuthorID == author_id) & (
         Author.UserID == session['user']['UserID'])).one()
     books = author.Book
@@ -110,10 +126,9 @@ def author_book_route(author_id):
     return render_template('book.html', title=title, author=author, books=books)
 
 
-@app.route('/quote')
-def quote():
-    return jsonify(Quote.query.all())
-
+#######################################################################
+#    Book Subroutes
+#######################################################################
 
 @app.route('/book/<int:book_id>')
 @requires_auth
@@ -121,6 +136,16 @@ def book_route(book_id):
     book = Book.query.filter(Book.BookID == book_id).one()
     app.logger.info(book.Quotes())
     return render_template('book.html', title=book.Title, books=[book, ])
+
+
+#######################################################################
+#    Quote Subroutes
+#######################################################################
+
+
+@app.route('/quote')
+def quote():
+    return jsonify(Quote.query.all())
 
 
 @app.route("/login", methods=['GET', 'POST'])

@@ -1,177 +1,149 @@
-{% extends "base.html" %} {% block content %}
+{% extends "base_with_menus.html" %} {% block content %}
+<!-- Page Heading -->
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+  <h1 class="h3 mb-0 text-gray-800">
+    {% if author is defined %} View Books of {{ author.FullName }} {% else %}
+    View Book {% endif %}
+  </h1>
+</div>
+{% for book in books %}
+<!-- Content Row -->
+<div class="row">
+  <!-- Content Column -->
+  <div class="col mb-4">
+    <!-- Random Quote Dropdown Card -->
+    <div class="card shadow mb-4">
+      <!-- Card Header - Dropdown -->
+      <div
+        class="card-header py-3 d-flex flex-row align-items-center justify-content-between"
+      >
+        <h6 class="m-0 font-weight-bold text-primary">
+          {{ book.Title }}
+        </h6>
+        <div class="dropdown no-arrow">
+          <a
+            class="dropdown-toggle"
+            href="#"
+            role="button"
+            id="bookDropdown"
+            data-toggle="dropdown"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >
+            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+          </a>
+          <div
+            class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
+            aria-labelledby="bookDropdown"
+          >
+            <div class="dropdown-header">Show</div>
 
-<a id="page-top"></a>
-<!-- Page Wrapper -->
-<div id="wrapper">
-  <!-- Sidebar -->
-  {% include "menu.html" %}
-  <!-- End of Sidebar -->
+            <a class="dropdown-item" href="/book/{{ book.BookID }}/author"
+              ><i class="fas fa-user-edit text-gray-300"></i> {%
+              if(book.Authors() == 1) %} &nbsp;<span>Author</span> {% else %}
+              &nbsp;<span>Author</span>
+              {% endif %}
+            </a>
+            <a class="dropdown-item" href="#"
+              ><i class="fas fa-quote-left text-gray-300"></i> &nbsp;<span>
+                Quotes</span
+              ></a
+            >
 
-  <!-- Content Wrapper -->
-  <div id="content-wrapper" class="d-flex flex-column">
-    <!-- Main Content -->
-    <div id="content">
-      <!-- Topbar -->
-      {% include "navbar.html" %}
-      <!-- End of Topbar -->
+            <div class="dropdown-divider"></div>
+            <div class="dropdown-header">Actions</div>
+            <a class="dropdown-item" href="#"
+              ><i class="fas fa-edit text-gray-300"></i> &nbsp;<span
+                >Modify</span
+              ></a
+            >
+            <a class="dropdown-item" href="#"
+              ><i class="fas fa-plus text-gray-300"></i> &nbsp;<span>
+                Add quote</span
+              ></a
+            >
 
-      <!-- Begin Page Content -->
-      <div class="container-fluid">
-        <!-- Page Heading -->
-        <div class="d-sm-flex align-items-center justify-content-between mb-4">
-          <h1 class="h3 mb-0 text-gray-800">
-            {% if author is defined %} View Books of {{ author.FullName }} {%
-            else %} View Book {% endif %}
-          </h1>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="#"
+              ><i class="fas fa-share-alt text-gray-300"></i> &nbsp;<span
+                >Share</span
+              ><span class="badge badge-danger badge-counter"
+                >Coming soon!</span
+              ></a
+            >
+          </div>
         </div>
-        {% for book in books %}
-        <!-- Content Row -->
+      </div>
+      <!-- Card Body -->
+      <div class="card-body">
         <div class="row">
-          <!-- Content Column -->
-          <div class="col mb-4">
-            <!-- Random Quote Dropdown Card -->
-            <div class="card shadow mb-4">
-              <!-- Card Header - Dropdown -->
-              <div
-                class="card-header py-3 d-flex flex-row align-items-center justify-content-between"
-              >
-                <h6 class="m-0 font-weight-bold text-primary">
-                  {{ book.Title }}
-                </h6>
-                <div class="dropdown no-arrow">
-                  <a
-                    class="dropdown-toggle"
-                    href="#"
-                    role="button"
-                    id="bookDropdown"
-                    data-toggle="dropdown"
-                    aria-haspopup="true"
-                    aria-expanded="false"
-                  >
-                    <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
-                  </a>
-                  <div
-                    class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
-                    aria-labelledby="bookDropdown"
-                  >
-                    <div class="dropdown-header">Show</div>
+          <div class="col-xl-8 m-0">
+            <div class="table-responsive">
+              <table class="table table-bordered" width="100%" cellspacing="0">
+                <tbody>
+                  <tr>
+                    <th>Title</th>
+                    <td>{{ book.Title | safe }}</td>
+                  </tr>
+                  <tr>
+                    <th>Subtitle</th>
+                    <td>{{ book.Subtitle | safe }}</td>
+                  </tr>
+                  <tr>
+                    <th>Author</th>
+                    <td>{{ make_author_list(book.Author) | safe }}</td>
+                  </tr>
 
-                    <a
-                      class="dropdown-item"
-                      href="/book/{{ book.BookID }}/author"
-                      ><i class="fas fa-user-edit text-gray-300"></i> {%
-                      if(book.Authors() == 1) %} &nbsp;<span>Author</span> {%
-                      else %} &nbsp;<span>Author</span>
-                      {% endif %}
-                    </a>
-                    <a class="dropdown-item" href="#"
-                      ><i class="fas fa-quote-left text-gray-300"></i>
-                      &nbsp;<span> Quotes</span></a
-                    >
+                  <tr>
+                    <th>Quotes</th>
+                    <td>{{ book.Quotes() }}</td>
+                  </tr>
 
-                    <div class="dropdown-divider"></div>
-                    <div class="dropdown-header">Actions</div>
-                    <a class="dropdown-item" href="#"
-                      ><i class="fas fa-edit text-gray-300"></i> &nbsp;<span
-                        >Modify</span
-                      ></a
-                    >
-                    <a class="dropdown-item" href="#"
-                      ><i class="fas fa-plus text-gray-300"></i> &nbsp;<span>
-                        Add quote</span
-                      ></a
-                    >
+                  <tr>
+                    <th>Pages</th>
+                    <td>{{ book.Pages }}</td>
+                  </tr>
+                  <tr>
+                    <th style="width: 20%">Publication Date</th>
+                    <td>{{ book.PublicationDate }}</td>
+                  </tr>
+                  <tr>
+                    <th>ISBN</th>
+                    <td>{{ book.ISBN }}</td>
+                  </tr>
+                  <tr>
+                    <th>Blurb</th>
+                    <td>{{ book.Blurb | safe }}</td>
+                  </tr>
 
-                    <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="#"
-                      ><i class="fas fa-share-alt text-gray-300"></i>
-                      &nbsp;<span>Share</span
-                      ><span class="badge badge-danger badge-counter"
-                        >Coming soon!</span
-                      ></a
-                    >
-                  </div>
-                </div>
-              </div>
-              <!-- Card Body -->
-              <div class="card-body">
-                <div class="row">
-                  <div class="col-xl-8 m-0">
-                    <div class="table-responsive">
-                      <table
-                        class="table table-bordered"
-                        width="100%"
-                        cellspacing="0"
-                      >
-                        <tbody>
-                          <tr>
-                            <th>Title</th>
-                            <td>{{ book.Title | safe }}</td>
-                          </tr>
-                          <tr>
-                            <th>Subtitle</th>
-                            <td>{{ book.Subtitle | safe }}</td>
-                          </tr>
-                          <tr>
-                            <th>Author</th>
-                            <td>{{ make_author_list(book.Author) | safe }}</td>
-                          </tr>
-
-                          <tr>
-                            <th>Quotes</th>
-                            <td>{{ book.Quotes() }}</td>
-                          </tr>
-
-                          <tr>
-                            <th>Pages</th>
-                            <td>{{ book.Pages }}</td>
-                          </tr>
-                          <tr>
-                            <th style="width: 20%">Publication Date</th>
-                            <td>{{ book.PublicationDate }}</td>
-                          </tr>
-                          <tr>
-                            <th>ISBN</th>
-                            <td>{{ book.ISBN }}</td>
-                          </tr>
-                          <tr>
-                            <th>Blurb</th>
-                            <td>{{ book.Blurb | safe }}</td>
-                          </tr>
-
-                          <tr>
-                            <th>Notes</th>
-                            <td>{{ book.Notes | safe }}</td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                  <div class="col-xl-4 m-0">
-                    <div class="h5 mb-0 mx-3 d-flex justify-content-center">
-                      <a href="/book/{{ book.BookID }}">
-                        <img
-                          width="100%"
-                          class="img-profile rounded-lg"
-                          src="{{ url_for('static', filename='img/covers/'+ book.CoverPath)}}"
-                          data-toggle="tooltip"
-                          data-placement="top"
-                          title="{{ book.Title }}"
-                        />
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              </div>
+                  <tr>
+                    <th>Notes</th>
+                    <td>{{ book.Notes | safe }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="col-xl-4 m-0">
+            <div class="h5 mb-0 mx-3 d-flex justify-content-center">
+              <a href="/book/{{ book.BookID }}">
+                <img
+                  width="100%"
+                  class="img-profile rounded-lg"
+                  src="{{ url_for('static', filename='img/covers/'+ book.CoverPath)}}"
+                  data-toggle="tooltip"
+                  data-placement="top"
+                  title="{{ book.Title }}"
+                />
+              </a>
             </div>
           </div>
         </div>
-        {% endfor %}
       </div>
     </div>
   </div>
 </div>
-{% endblock %}{% block script %}
+{% endfor %} {% endblock %}{% block script %}
 
 <script>
   $(function() {
