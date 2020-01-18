@@ -10,7 +10,7 @@ from flask_sqlalchemy import SQLAlchemy
 def make_author_list(author):
     """Produces a string of author or authors"""
 
-    names_list = [a.FirstName + ' ' + a.LastName for a in author]
+    names_list = [a.FullName for a in author]
     if len(names_list) == 1:
         return names_list[0]
     else:

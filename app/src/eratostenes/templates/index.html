@@ -1,6 +1,4 @@
-{% extends "base.html" %} {% block content %}
-
-<a id="page-top"></a>
+{% extends "base_with_menus.html" %} {% block content %}
 <!-- Page Wrapper -->
 <div id="wrapper">
   <!-- Sidebar -->
@@ -18,7 +16,7 @@
       <!-- Begin Page Content -->
       <div class="container-fluid">
         <!-- Page Heading -->
-        <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <div class="d-sm-flex align-items-center justify-content-between my-4">
           <h1 class="h3 mb-0 text-gray-800">Welcome</h1>
         </div>
 
@@ -122,11 +120,13 @@
                     aria-labelledby="quoteDropdown"
                   >
                     <div class="dropdown-header">Actions</div>
-                    <a class="dropdown-item" href="#"
+                    <a
+                      class="dropdown-item"
+                      href="authors/{{ quote.Book.BookID }}"
                       ><i class="fas fa-user-edit text-gray-300"></i>
                       &nbsp;<span>Show Author</span></a
                     >
-                    <a class="dropdown-item" href="#"
+                    <a class="dropdown-item" href="book/{{ quote.Book.BookID }}"
                       ><i class="fas fa-book text-gray-300"></i> &nbsp;<span>
                         Show Book</span
                       ></a
@@ -149,18 +149,22 @@
                   <div class="card-body">
                     <div class="row no-gutters align-items-center">
                       <div class="col mr-2">
-                        <div
-                          class="text-xs font-weight-bold text-erat text-uppercase mb-1"
-                        >
-                          {{ make_author_list(quote.Book.Author) | safe }} - {{
-                          quote.Book.Title }}
-                        </div>
                         <div class="h5 mb-0 font-weight-bold text-gray-800">
                           {{ quote.QuoteText | safe}}
                         </div>
                       </div>
                       <div class="col-auto">
                         <i class="fas fa-quote-left fa-2x text-gray-300"></i>
+                      </div>
+                    </div>
+                    <div class="row mt-2">
+                      <div class="col">
+                        <div
+                          class="text-xs font-weight-bold text-erat text-right text-uppercase mb-1"
+                        >
+                          {{ make_author_list(quote.Book.Author) | safe }} - {{
+                          quote.Book.Title }}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -219,7 +223,7 @@
                                   src="{{ url_for('static', filename='img/authors/'+ author.PicturePath )}}"
                                   data-toggle="tooltip"
                                   data-placement="top"
-                                  title="{{ author.FirstName }} {{ author.LastName }}"
+                                  title="{{ author.FullName }}"
                                 />
                               </a>
                               {% endfor %}

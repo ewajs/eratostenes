@@ -14,6 +14,15 @@ class Author(db.Model):
     CountryID = db.Column(db.Integer)
     UserID = db.Column(db.Integer, nullable=False)
 
+    Book = db.relationship('Book', secondary='BookAuthor')
+
+    def Books(self):
+        return len(self.Book)
+
+    @property
+    def FullName(self):
+        return self.FirstName + ' ' + self.LastName
+
 
 # class BookAuthor(db.Model):
 #     __tablename__ = 'BookAuthor'
@@ -76,8 +85,15 @@ class Book(db.Model):
 
     User = db.relationship('User', primaryjoin='Book.UserID == User.UserID')
     User1 = db.relationship('User', primaryjoin='Book.UserID == User.UserID')
+    Quote = db.relationship('Quote', primaryjoin='Book.BookID == Quote.BookID')
     Genre = db.relationship('Genre', secondary='BookGenre')
     Author = db.relationship('Author', secondary='BookAuthor')
+
+    def Quotes(self):
+        return len(self.Quote)
+
+    def Authors(self):
+        return len(self.Author)
 
     def to_dict(self):
         return {'BookID': self.BookID,

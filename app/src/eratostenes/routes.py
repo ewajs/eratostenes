@@ -70,6 +70,9 @@ def get_random_quote(user_id):
 # Routes
 #######################################################################
 
+#######################################################################
+#    Main
+#######################################################################
 
 @app.route('/')
 @requires_auth
@@ -86,10 +89,25 @@ def user_route():
     users = User.query.filter(User.Username == "ewajs").first()
     return users.Email
 
+########################################
 
-@app.route('/author')
-def author():
-    return jsonify(Author.query.all())
+
+@app.route('/author/<int:author_id>')
+@requires_auth
+def author_route(author_id):
+    author = Author.query.filter((Author.AuthorID == author_id) & (
+        Author.UserID == session['user']['UserID'])).one()
+    return render_template('author.html', title=author.FullName, author=author)
+
+
+@app.route('/author/<int:author_id>/books')
+@requires_auth
+def author_book_route(author_id):
+    author = Author.query.filter((Author.AuthorID == author_id) & (
+        Author.UserID == session['user']['UserID'])).one()
+    books = author.Book
+    title = "Books of " + author.FullName
+    return render_template('book.html', title=title, author=author, books=books)
 
 
 @app.route('/quote')
@@ -97,12 +115,12 @@ def quote():
     return jsonify(Quote.query.all())
 
 
-@app.route('/book')
-def book():
-    books = []
-    for book in Book.query.all():
-        books.append(book.to_dict())
-    return jsonify(books)
+@app.route('/book/<int:book_id>')
+@requires_auth
+def book_route(book_id):
+    book = Book.query.filter(Book.BookID == book_id).one()
+    app.logger.info(book.Quotes())
+    return render_template('book.html', title=book.Title, books=[book, ])
 
 
 @app.route("/login", methods=['GET', 'POST'])
