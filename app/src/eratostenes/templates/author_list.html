@@ -1,0 +1,122 @@
+{% extends "base_with_menus.html" %} {% block content %}
+<!-- Page Heading -->
+<h1 class="h3 mb-2 text-gray-800">Author List</h1>
+<!-- DataTales Example -->
+<div class="table-responsive">
+  <table
+    class="table table-bordered"
+    id="dataTable"
+    width="100%"
+    cellspacing="0"
+  >
+    <thead>
+      <tr>
+        <th>Full Name</th>
+        <th>Books</th>
+        <th>Quotes</th>
+        <th>Birthdate</th>
+        <th>Country</th>
+        <th>Options</th>
+      </tr>
+    </thead>
+    <tfoot>
+      <tr>
+        <th>Full Name</th>
+        <th>Books</th>
+        <th>Quotes</th>
+        <th>Birthdate</th>
+        <th>Country</th>
+        <th>Options</th>
+      </tr>
+    </tfoot>
+    <tbody>
+      {% for author in authors %}
+      <tr>
+        <td>{{ author.FullName }}</td>
+        <td>{{ author.Books }}</td>
+        <td>{{ author.Quotes }}</td>
+        <td>{{ author.BirthDate }}</td>
+        <td>{{ author.Country.CountryName }}</td>
+        <td class="text-center">
+          <div class="dropdown">
+            <a
+              class="btn btn-primary dropdown-toggle"
+              href="#"
+              role="button"
+              id="authorDropdown{{author.AuthorID}}"
+              data-toggle="dropdown"
+              aria-haspopup="true"
+              aria-expanded="false"
+            >
+              More...
+            </a>
+            <div
+              class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
+              aria-labelledby="authorDropdown{{author.AuthorID}}"
+            >
+              <div class="dropdown-header">Show</div>
+              <a class="dropdown-item" href="/author/{{author.AuthorID}}"
+                ><i class="fas fa-share-square text-gray-300"></i> &nbsp;<span
+                  >Full Data</span
+                ></a
+              >
+              <a class="dropdown-item" href="/author/{{author.AuthorID}}/books"
+                ><i class="fas fa-book text-gray-300"></i> &nbsp;<span
+                  >Books</span
+                ></a
+              >
+              <a class="dropdown-item" href="/author/{{author.AuthorID}}/quotes"
+                ><i class="fas fa-quote-left text-gray-300"></i> &nbsp;<span>
+                  Quotes</span
+                ></a
+              >
+
+              <div class="dropdown-divider"></div>
+              <div class="dropdown-header">Actions</div>
+              <a class="dropdown-item" href="#"
+                ><i class="fas fa-edit text-gray-300"></i> &nbsp;<span
+                  >Modify</span
+                ></a
+              >
+              <a class="dropdown-item" href="#"
+                ><i class="fas fa-book text-gray-300"></i> &nbsp;<span>
+                  Add book</span
+                ></a
+              >
+
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="#"
+                ><i class="fas fa-share-alt text-gray-300"></i> &nbsp;<span
+                  >Share</span
+                ><span class="badge badge-danger badge-counter"
+                  >Coming soon!</span
+                ></a
+              >
+            </div>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}{% block script %}
+<!-- Custom styles for this page -->
+<link
+  href="{{ url_for('static', filename='vendor/datatables/dataTables.bootstrap4.min.css') }}"
+  rel="stylesheet"
+/>
+<!-- Page level plugins -->
+<script src="{{ url_for('static', filename='vendor/datatables/jquery.dataTables.min.js') }}"></script>
+<script src="{{ url_for('static', filename='vendor/datatables/dataTables.bootstrap4.min.js') }}"></script>
+
+<!-- Page level custom scripts -->
+<script>
+  // Call the dataTables jQuery plugin
+  $(document).ready(function() {
+    $("#dataTable").DataTable();
+  });
+</script>
+
+{% endblock %}

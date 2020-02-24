@@ -39,9 +39,10 @@
             <div class="dropdown-header">Show</div>
 
             <a class="dropdown-item" href="/book/{{ book.BookID }}/authors"
-              ><i class="fas fa-user-edit text-gray-300"></i> {%
-              if(book.Authors() == 1) %} &nbsp;<span>Author</span> {% else %}
-              &nbsp;<span>Author</span>
+              ><i class="fas fa-user-edit text-gray-300"></i> {% if(book.Authors
+              == 1) %} &nbsp;<span>Author</span> {% else %} &nbsp;<span
+                >Author</span
+              >
               {% endif %}
             </a>
             <a class="dropdown-item" href="#"
@@ -91,12 +92,12 @@
                   </tr>
                   <tr>
                     <th>Author</th>
-                    <td>{{ make_author_list(book.Author) | safe }}</td>
+                    <td>{{ book.AuthorName | safe }}</td>
                   </tr>
 
                   <tr>
                     <th>Quotes</th>
-                    <td>{{ book.Quotes() }}</td>
+                    <td>{{ book.Quotes }}</td>
                   </tr>
 
                   <tr>

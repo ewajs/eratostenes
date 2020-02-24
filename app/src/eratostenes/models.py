@@ -17,8 +17,17 @@ class Author(db.Model):
     Country = db.relationship('Country')
     Book = db.relationship('Book', secondary='BookAuthor')
 
+    def __init__(self, data):
+        pass
+    
+    @property
     def Books(self):
         return len(self.Book)
+
+    @property
+    def Quotes(self):
+        # add all quotes of my books
+        return sum([book.Quotes for book in self.Book])
 
     @property
     def FullName(self):
@@ -47,6 +56,9 @@ class Country(db.Model):
 
     CountryID = db.Column(db.Integer, primary_key=True)
     CountryName = db.Column(db.String(255), nullable=False)
+
+    def display(self):
+        return 'CountryID: ' + str(self.CountryID) + ', CountryName: ' + self.CountryName
 
 
 class Genre(db.Model):
@@ -90,11 +102,21 @@ class Book(db.Model):
     Genre = db.relationship('Genre', secondary='BookGenre')
     Author = db.relationship('Author', secondary='BookAuthor')
 
+    @property
     def Quotes(self):
         return len(self.Quote)
 
+    @property
     def Authors(self):
         return len(self.Author)
+
+    @property
+    def AuthorName(self):
+        names_list = [author.FullName for author in self.Author]
+        if len(names_list) == 1:
+            return names_list[0]
+        else:
+            return ', '.join(names_list[:-1]) + ' and ' + names_list[-1]
 
     def to_dict(self):
         return {'BookID': self.BookID,

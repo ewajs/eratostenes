@@ -1,8 +1,8 @@
 import crypt
-from eratostenes.forms import LoginForm
+from eratostenes.forms import LoginForm, AuthorForm
 from eratostenes import app
 from eratostenes import db
-from eratostenes.models import User, Book, Author, Quote
+from eratostenes.models import User, Book, Author, Quote, Country
 from flask import flash, jsonify, render_template, redirect, request, session, url_for
 from sqlalchemy.sql import func
 from functools import wraps
@@ -58,12 +58,19 @@ def get_user_stats(user_id):
 def get_random_quote(user_id):
     data = Quote.query.filter(Quote.UserID == user_id).order_by(
         func.rand()).limit(1).one()
+    return data
 
+def get_3by3_matrix(entity, user_id):
+    data = entity.query.filter(entity.UserID == user_id).order_by(
+        func.rand()).limit(9).all()
+    matrix = [list(data[i:i+3]) for i in [0, 3, 6]]
+    #app.logger.info(matrix)
+    return matrix
     # data = Quote.query.filter(
     #     Quote.Book == Book.query.filter(
     #         Book.Title == 'Journey to the Ants').one()).order_by(func.rand()).limit(1).one()
    # Quote.UserID == user_id).order_by(func.rand()).limit(1).one()
-    return data
+    
 
 
 #######################################################################
@@ -97,10 +104,37 @@ def user_route():
 #######################################################################
 #   Author Subroutes
 #######################################################################
+#######################################################################
+#       Add Author
+#######################################################################
+
+@app.route('/author/add')
+@requires_auth
+def author_add_route():
+    """Serves the add author page"""
+    form = AuthorForm()
+    # If a valid form is received
+    if form.validate_on_submit():
+        #TODO: Add author to database and upload picture
+        return True
+    authors_matrix = get_3by3_matrix(Author, session['user']['UserID'])
+    return render_template('author_add.html', title="Add Author", form=form, authors_matrix = authors_matrix)
+
+#######################################################################
+#       List Authors
+#######################################################################
+
+@app.route('/author/list')
+@requires_auth
+def author_list_route():
+    """Serves the author list page"""
+    authors = Author.query.filter(Author.UserID == session['user']['UserID']).all()
+    return render_template('author_list.html', title="My Authors", authors = authors)
 
 #######################################################################
 #       Author by ID
 #######################################################################
+
 
 @app.route('/author/<int:author_id>')
 @requires_auth
@@ -130,6 +164,32 @@ def author_book_route(author_id):
 #   Book Subroutes
 #######################################################################
 
+@app.route('/author/add')
+@requires_auth
+def book_add_route():
+    """Serves the add book page"""
+    form = BookForm()
+    # TODO: Continue working here
+    form.authors.choices = [(author.AuthorID, author.FullName) for author in Author.query.filter(Author.UserID == session['user']['UserID']).all()]
+    # If a valid form is received
+    if form.validate_on_submit():
+        #TODO: Add book to database and upload picture
+        return True
+    books_matrix = get_3by3_matrix(Book, session['user']['UserID'])
+    return render_template('book_add.html', title="Add Book", form=form, books_matrix = books_matrix)
+
+
+#######################################################################
+#       List Books
+#######################################################################
+
+@app.route('/book/list')
+@requires_auth
+def book_list_route():
+    """Serves the book list page"""
+    books = Book.query.filter(Book.UserID == session['user']['UserID']).all()
+    return render_template('book_list.html', title="My Books", books = books)
+
 #######################################################################
 #       Book by ID
 #######################################################################
@@ -140,7 +200,7 @@ def book_route(book_id):
     """Renders Book with BookID equal to book_id for the logged user"""
     book = Book.query.filter((Book.BookID == book_id) & (
         Author.UserID == session['user']['UserID'])).one()
-    app.logger.info(book.Quotes())
+    app.logger.info(book.Quotes)
     return render_template('book.html', title=book.Title, books=[book, ])
 
 #######################################################################

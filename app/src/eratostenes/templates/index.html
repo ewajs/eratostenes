@@ -144,8 +144,7 @@
                 <div
                   class="text-xs font-weight-bold text-erat text-right text-uppercase mb-1"
                 >
-                  {{ make_author_list(quote.Book.Author) | safe }} - {{
-                  quote.Book.Title }}
+                  {{ quote.Book.AuthorName | safe }} - {{ quote.Book.Title }}
                 </div>
               </div>
             </div>

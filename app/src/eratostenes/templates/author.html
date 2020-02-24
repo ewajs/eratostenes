@@ -2,7 +2,7 @@
 <!-- Page Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
   <h1 class="h3 mb-0 text-gray-800">
-    {% if book is defined %} {% if book.Authors() == 1 %} View Author of {{
+    {% if book is defined %} {% if book.Authors == 1 %} View Author of {{
     book.Title | safe}} {% else %} View Authors of {{ book.Title | safe}} {%
     endif %} {% else %} View Author {% endif %}
   </h1>
@@ -89,7 +89,7 @@
                   <tr>
                     <th>Books</th>
                     <td>
-                      {{ author.Books() }}
+                      {{ author.Books }}
                     </td>
                   </tr>
                   <tr>
