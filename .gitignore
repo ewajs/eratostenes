@@ -1,5 +1,6 @@
 *.bak
 .env
+app/.data/*
 db/.data/*
 __pycache__
 venv

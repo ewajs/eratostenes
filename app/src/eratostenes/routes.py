@@ -1,17 +1,13 @@
 import crypt
-from eratostenes.forms import LoginForm, AuthorForm
+from eratostenes.forms import LoginForm, AuthorForm, BookForm
 from eratostenes import app
 from eratostenes import db
-from eratostenes.models import User, Book, Author, Quote, Country
+from eratostenes.models import User, Book, Author, Quote, Country, Genre
 from flask import flash, jsonify, render_template, redirect, request, session, url_for
 from sqlalchemy.sql import func
 from functools import wraps
 from hmac import compare_digest as compare_hash
 
-
-#######################################################################
-# Helpers
-#######################################################################
 
 #######################################################################
 # Decorators
@@ -44,6 +40,12 @@ def elapsed_time(f):
 # Functions
 #######################################################################
 
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
+
+def get_extension(filename):
+    return filename.rsplit('.', 1)[1].lower()
 
 def get_user_stats(user_id):
     authors = Author.query.with_entities(
@@ -60,18 +62,16 @@ def get_random_quote(user_id):
         func.rand()).limit(1).one()
     return data
 
-def get_3by3_matrix(entity, user_id):
-    data = entity.query.filter(entity.UserID == user_id).order_by(
-        func.rand()).limit(9).all()
+def get_3by3_matrix(entity, user_id, filter_by=None):
+    if filter_by is None:
+        data = entity.query.filter(entity.UserID == user_id).order_by(
+            func.rand()).limit(9).all()
+    else: # if an author is provided
+        data = entity.query.filter((entity.UserID == user_id) & (entity.Author.any(AuthorID = filter_by.AuthorID))).order_by(
+            func.rand()).limit(9).all()
     matrix = [list(data[i:i+3]) for i in [0, 3, 6]]
     #app.logger.info(matrix)
     return matrix
-    # data = Quote.query.filter(
-    #     Quote.Book == Book.query.filter(
-    #         Book.Title == 'Journey to the Ants').one()).order_by(func.rand()).limit(1).one()
-   # Quote.UserID == user_id).order_by(func.rand()).limit(1).one()
-    
-
 
 #######################################################################
 # Routes
@@ -108,17 +108,38 @@ def user_route():
 #       Add Author
 #######################################################################
 
-@app.route('/author/add')
+@app.route('/author/add', methods=['GET', 'POST'])
 @requires_auth
 def author_add_route():
     """Serves the add author page"""
+    error = None
     form = AuthorForm()
     # If a valid form is received
-    if form.validate_on_submit():
-        #TODO: Add author to database and upload picture
-        return True
+    if form.validate_on_submit():      
+        # Valid picture file submitted or no picture
+        # Create the Author and add to DB
+        new_author = Author(FirstName=form.first_name.data, 
+                        LastName=form.last_name.data,
+                        BirthDate=form.birthdate.data,
+                        Bio=form.bio.data,
+                        Notes=form.notes.data,
+                        Country=form.country.data,
+                        UserID=session['user']['UserID'])
+        db.session.add(new_author)
+        db.session.commit()
+        author_id = new_author.AuthorID
+        app.logger.debug(f"AuthorID: {author_id}")
+        if form.picture.data is not None:
+            # Picture was submitted, save with convention
+            ext = get_extension(form.picture.data.filename)
+            new_filename = f"a{author_id}.{ext}"
+            form.picture.data.save(f"{app.config['UPLOAD_FOLDER']}/authors/{new_filename}") 
+            # Update database with new filename
+            new_author.PicturePath = new_filename
+            db.session.commit()
+        return redirect(f"/author/{author_id}")          
     authors_matrix = get_3by3_matrix(Author, session['user']['UserID'])
-    return render_template('author_add.html', title="Add Author", form=form, authors_matrix = authors_matrix)
+    return render_template('author_add.html', title="Add Author", form=form, authors_matrix = authors_matrix, error=error)
 
 #######################################################################
 #       List Authors
@@ -159,24 +180,32 @@ def author_book_route(author_id):
     title = "Books of " + author.FullName
     return render_template('book.html', title=title, author=author, books=books)
 
-
 #######################################################################
 #   Book Subroutes
 #######################################################################
 
-@app.route('/author/add')
+@app.route('/book/add')
 @requires_auth
 def book_add_route():
     """Serves the add book page"""
+    if request.method == 'GET':
+        # if the by_author parameter is set, add a book by that author.
+        author_id = request.values.get('by_author')
+        if author_id is not None:
+            author = Author.query.filter(Author.AuthorID == author_id and Author.UserID == session['user']['UserID']).one()
+        else:
+            author = None
+
     form = BookForm()
-    # TODO: Continue working here
     form.authors.choices = [(author.AuthorID, author.FullName) for author in Author.query.filter(Author.UserID == session['user']['UserID']).all()]
+    form.genres.choices = [(genre.GenreID, genre.GenreName) for genre in Genre.query.all()]
+    
     # If a valid form is received
     if form.validate_on_submit():
         #TODO: Add book to database and upload picture
         return True
-    books_matrix = get_3by3_matrix(Book, session['user']['UserID'])
-    return render_template('book_add.html', title="Add Book", form=form, books_matrix = books_matrix)
+    books_matrix = get_3by3_matrix(Book, session['user']['UserID'], author)
+    return render_template('book_add.html', title="Add Book", form=form, books_matrix = books_matrix, author=author)
 
 
 #######################################################################

@@ -12,13 +12,18 @@ The database used is MySQL and it runs on a container itself, to ensure continui
 
 In order to initialize the database for the first time you can run the `initialize.sh` script which will instanitate a mysql container mounting the `.data` folder onto the container and then run a command inside it to create all tables.
 
-Your `.env` file will need all these variables defined:
+Your `.env` file will need all these variables defined (values in CAPS are secrets provided by you):
 
 ```
 MYSQL_DATABASE=eratostenes
 MYSQL_USER=YOUR_USER
 MYSQL_PASSWORD=YOUR_PASS
 MYSQL_ROOT_PASSWORD=YOUR_ROOT_PASS
+DATABASE_HOST=db
+SQLALCHEMY_TRACK_MODIFICATIONS=False
+SECRET_KEY=YOUR_SECRET_KEY
+UPLOAD_FOLDER=/app/src/eratostenes/static/img/
+MAX_CONTENT_LENGTH=2097152 # Max File Size = 2 * 1024 * 1024 B = 2097152 B = 2 MB
 ```
 
 After creating and loading the `.env` file with the required values just run: `./initialize.sh`

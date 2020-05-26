@@ -12,14 +12,12 @@ class Author(db.Model):
     PicturePath = db.Column(db.String(255))
     Notes = db.Column(db.Text)
     CountryID = db.Column(db.ForeignKey('Country.CountryID'))
-    UserID = db.Column(db.Integer, nullable=False)
+    UserID = db.Column(db.ForeignKey('User.UserID'))
 
+    User = db.relationship('User', primaryjoin='Author.UserID == User.UserID')
     Country = db.relationship('Country')
     Book = db.relationship('Book', secondary='BookAuthor')
 
-    def __init__(self, data):
-        pass
-    
     @property
     def Books(self):
         return len(self.Book)

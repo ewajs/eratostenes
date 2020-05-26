@@ -1,9 +1,10 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, DateField, TextAreaField, SelectMultipleField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, DateField, TextAreaField, SelectMultipleField, IntegerField, SelectField
 from wtforms.validators import DataRequired, Optional
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from eratostenes.models import Country
+from eratostenes import app
 
 
 def possible_countries():
@@ -19,24 +20,35 @@ class LoginForm(FlaskForm):
 class AuthorForm(FlaskForm):
     first_name = StringField('First Name', validators=[DataRequired()])
     last_name = StringField('Last Name', validators=[DataRequired()])
-    birthdate = DateField('Birthday', format='%d/%m/%Y', validators=[Optional()])
+    birthdate = DateField('Birthday', format='%Y-%m-%d', validators=[Optional()])
     country = QuerySelectField(
         'Country', query_factory=possible_countries, get_label='CountryName', allow_blank=False)
     bio = TextAreaField('Bio')
     notes = TextAreaField('Notes')
     picture = FileField('Picture', validators=[
-                        FileAllowed(['jpg', 'png'], 'Images only!')])
-    submit = SubmitField('Sign In')
+                        FileAllowed(app.config['ALLOWED_EXTENSIONS'], 'Image format not supported, allowed extensions are ' + ', '.join(app.config['ALLOWED_EXTENSIONS']))])
+    submit = SubmitField('Submit')
 
 
 class BookForm(FlaskForm):
     title = StringField('Title', validators=[DataRequired()])
-    subtitle = StringField('Subtitle', validators=[DataRequired()])
-    authors = SelectMultipleField('Author(s)',validators=[DataRequired()])
-    country = QuerySelectField(
-        'Country', query_factory=possible_countries, get_label='CountryName', allow_blank=False)
-    bio = TextAreaField('Bio')
+    subtitle = StringField('Subtitle')
+    pages = IntegerField('Pages', validators=[DataRequired()])
+    publication_date = DateField('Publication Date', format='%d/%m/%Y', validators=[Optional()])
+    authors = SelectMultipleField('Author(s)', validators=[DataRequired()])
+    genres = SelectMultipleField('Genre(s)')
+    isbn = StringField('ISBN')
+    blurb = TextAreaField('Blurb')
     notes = TextAreaField('Notes')
     picture = FileField('Picture', validators=[
-                        FileAllowed(['jpg', 'png'], 'Images only!')])
-    submit = SubmitField('Sign In')
+                        FileAllowed(app.config['ALLOWED_EXTENSIONS'], 'Image format not supported, allowed extensions are ' + ', '.join(app.config['ALLOWED_EXTENSIONS']))])
+    submit = SubmitField('Submit')
+
+class QuoteForm(FlaskForm):
+    page = IntegerField('Pages', validators=[DataRequired()])
+    book = SelectField('Book', validators=[DataRequired()])
+    character = StringField('ISBN')
+    quote = TextAreaField('Blurb', validators=[DataRequired()])
+    notes = TextAreaField('Notes')
+    
+    submit = SubmitField('Submit')

@@ -12,6 +12,9 @@ class Config(object):
         getenv('MYSQL_PASSWORD') + '@' + getenv('DATABASE_HOST') + \
         '/' + getenv('MYSQL_DATABASE')
     SQLALCHEMY_TRACK_MODIFICATIONS = getenv('SQLALCHEMY_TRACK_MODIFICATIONS')
+    UPLOAD_FOLDER = getenv('UPLOAD_FOLDER')
+    MAX_CONTENT_LENGTH = int(getenv('MAX_CONTENT_LENGTH'))
+    ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 
 if __name__ == '__main__':

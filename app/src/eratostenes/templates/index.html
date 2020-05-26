@@ -189,7 +189,7 @@
                     <div
                       class="text-xs font-weight-bold text-primary text-uppercase mb-1"
                     >
-                      Author{% if quote.Book.Authors() > 1 %}s{% endif %}
+                      Author{% if quote.Book.Authors > 1 %}s{% endif %}
                     </div>
                     <div class="h5 d-flex justify-content-center">
                       {% for author in quote.Book.Author %}
@@ -220,7 +220,7 @@
 {% endblock %} {% block script %}
 
 <script>
-  $(function() {
+  $(function () {
     $('[data-toggle="tooltip"]').tooltip();
   });
 </script>

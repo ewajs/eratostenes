@@ -20,7 +20,9 @@ services:
     build:
       context: ./app
     volumes:
+      # For debug purposes
       - ./app/src:/app/src
+      - ./app/.data/img:/app/src/eratostenes/static/img
     restart: always
     depends_on:
       - db
@@ -35,3 +37,5 @@ services:
       - DATABASE_HOST
       - SQLALCHEMY_TRACK_MODIFICATIONS
       - SECRET_KEY
+      - UPLOAD_FOLDER
+      - MAX_CONTENT_LENGTH

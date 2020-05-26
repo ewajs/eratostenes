@@ -93,15 +93,16 @@
                     </td>
                   </tr>
                   <tr>
-                    <th style="width: 20%">Birth Date</th>
+                    <th style="width: 20%;">Birth Date</th>
                     <td>
-                      {{ author.BirthDate }}
+                      {{ author.BirthDate if author.BirthDate else ''}}
                     </td>
                   </tr>
                   <tr>
                     <th>Country</th>
                     <td>
-                      {{ author.Country.CountryName }}
+                      {{ author.Country.CountryName if author.Country.CountryID
+                      != 1 else ''}}
                     </td>
                   </tr>
                   <tr>
@@ -126,7 +127,7 @@
                 <img
                   width="100%"
                   class="img-profile rounded-lg"
-                  src="{{ url_for('static', filename='img/authors/'+ author.PicturePath)}}"
+                  src="{{ url_for('static', filename='img/authors/'+ (author.PicturePath if author.PicturePath else 'empty.jpg'))}}"
                   data-toggle="tooltip"
                   data-placement="top"
                   title="{{ author.FullName }}"
@@ -142,7 +143,7 @@
 {%endfor%} {% endblock %}{% block script %}
 
 <script>
-  $(function() {
+  $(function () {
     $('[data-toggle="tooltip"]').tooltip();
   });
 </script>
