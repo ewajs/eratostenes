@@ -1,5 +1,5 @@
 import crypt
-from eratostenes.forms import LoginForm, AuthorForm, BookForm
+from eratostenes.forms import LoginForm, AuthorForm, BookForm, RegisterForm
 from eratostenes import app
 from eratostenes import db
 from eratostenes.models import User, Book, Author, Quote, Country, Genre
@@ -59,7 +59,7 @@ def get_user_stats(user_id):
 
 def get_random_quote(user_id):
     data = Quote.query.filter(Quote.UserID == user_id).order_by(
-        func.rand()).limit(1).one()
+        func.rand()).limit(1).first()
     return data
 
 def get_3by3_matrix(entity, user_id, filter_by=None):
@@ -256,6 +256,36 @@ def book_author_route(book_id):
 def quote():
     return jsonify(Quote.query.all())
 
+
+#######################################################################
+#    Register
+#######################################################################
+
+@app.route("/register", methods=['GET', 'POST'])
+def register():
+    """Serves the registration page and registers a new user"""
+    form = RegisterForm()
+    if form.validate_on_submit():
+        # fields do not match requirements
+        pw_match = form.password_verify.data == form.password.data
+        # email/user not already registered
+        already_taken = User.query.filter(
+            (User.Email == form.email.data) | (User.Username == form.username.data)).first() is not None
+        if not pw_match:
+            flash('Supplied passwords do not match.')
+        if already_taken:
+            flash('Username and/or email already taken.')
+        else: # Create user and log in
+            pw_hash = crypt.crypt(form.password.data) # Hash the pw
+            user = User(Username=form.username.data, Email=form.email.data, Hash=pw_hash)
+            db.session.add(user)
+            db.session.commit()
+            app.logger.debug(f"Registered {user.Username} with pw hash {user.Hash}")
+            # log in the user
+            session['user'] = user.to_dict()
+            return redirect('/')
+
+    return render_template("register.html", title="Register", form=form)
 
 #######################################################################
 #    Login

@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, DateField, TextAreaField, SelectMultipleField, IntegerField, SelectField
-from wtforms.validators import DataRequired, Optional
+from wtforms.validators import DataRequired, Optional, Email, Length
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from eratostenes.models import Country
 from eratostenes import app
@@ -15,6 +15,13 @@ class LoginForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
     remember_me = BooleanField('Remember Me')
     submit = SubmitField('Sign In')
+
+class RegisterForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired(), Length(min=4, message=('Your username is too short, 4 chars minimum.'))])
+    email = StringField('Email address', [DataRequired(), Email()])
+    password = PasswordField('Password', validators=[DataRequired(),Length(min=7, message=('Your password is too short. 7 chars minimum.'))])
+    password_verify = PasswordField('Password', validators=[DataRequired()])
+    submit = SubmitField('Sign Up')
 
 
 class AuthorForm(FlaskForm):

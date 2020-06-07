@@ -11,7 +11,7 @@
             <div class="col-lg-6">
               <div class="p-5">
                 <div class="text-center">
-                  <h1 class="h4 text-gray-900 mb-4">Welcome!</h1>
+                  <h1 class="h4 text-gray-900 mb-4">Register</h1>
                 </div>
                 {% with messages = get_flashed_messages() %} {% if messages %}
                 <div class="alert alert-danger" role="alert">
@@ -19,50 +19,30 @@
                 </div>
                 {% endif %} {% endwith %}
 
-                <form class="user" method="POST" action="/login">
+                <form class="user" method="POST" action="/register">
                   {{ form.hidden_tag() }}
                   <div class="form-group">
-                    <!-- <input
-                      type="email"
-                      class="form-control form-control-user"
-                      id="exampleInputEmail"
-                      aria-describedby="emailHelp"
-                      placeholder="Enter Email Address..."
-                    /> -->
+                    <label for="username">Username</label>
                     {{ form.username(class="form-control form-control-user",
-                    placeholder="Username", **{'aria-describedby': 'emailHelp'})
-                    }}
+                    placeholder="Username") }}
                   </div>
                   <div class="form-group">
+                    <label for="email">Email</label>
+                    {{ form.email(class="form-control form-control-user",
+                    placeholder="Email", **{'aria-describedby': 'emailHelp'}) }}
+                  </div>
+                  <div class="form-group">
+                    <label for="password">Password</label>
                     {{ form.password(class="form-control form-control-user",
                     placeholder="Password") }}
-                    <!-- <input
-                      type="password"
-                      class="form-control form-control-user"
-                      id="exampleInputPassword"
-                      placeholder="Password"
-                    /> -->
                   </div>
                   <div class="form-group">
-                    <div class="custom-control custom-checkbox small">
-                      {{ form.remember_me(class="custom-control-input") }}
-                      <!-- <input
-                        type="checkbox"
-                        class="custom-control-input"
-                        id="customCheck"
-                      /> -->
-                      <label class="custom-control-label" for="remember_me"
-                        >Remember Me</label
-                      >
-                    </div>
+                    <label for="password_verify">Password (verify)</label>
+                    {{ form.password_verify(class="form-control
+                    form-control-user", placeholder="Password (verify)") }}
                   </div>
-                  {{ form.submit(class="btn btn-primary btn-user btn-block") }}
-                  <!-- <a
-                    href="index.html"
-                    class="btn btn-primary btn-user btn-block"
-                  >
-                    Login
-                  </a> -->
+                  {{ form.submit(class="btn btn-primary btn-user btn-block",
+                  **{'disabled': True}) }}
                   <!-- <hr />
                   <a
                     href="index.html"
@@ -79,12 +59,9 @@
                 </form>
                 <hr />
                 <div class="text-center">
-                  <a class="small" href="forgot-password.html"
-                    >Forgot Password?</a
+                  <a class="small" href="/login"
+                    >Already have an account? Log in!</a
                   >
-                </div>
-                <div class="text-center">
-                  <a class="small" href="register">Create an Account!</a>
                 </div>
               </div>
             </div>
@@ -94,4 +71,8 @@
     </div>
   </div>
 </div>
+{% endblock %} {% block script %}
+
+<script src="{{ url_for('static', filename='js/validate.js') }}"></script>
+
 {% endblock %}

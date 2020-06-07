@@ -1,4 +1,5 @@
 cryptography
+email_validator
 flask
 flask-sqlalchemy
 flask-wtf
