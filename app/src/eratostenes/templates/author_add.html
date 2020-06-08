@@ -69,10 +69,19 @@
         <small class="text-danger">{{ error }}</small>
         {% endfor %}
       </div>
+      <div class="form-group">
+        <div class="custom-control custom-checkbox small">
+          {{ form.keep_adding(class="custom-control-input") }}
+          <label class="custom-control-label" for="keep_adding"
+            >Continue adding authors after submitting.</label
+          >
+        </div>
+      </div>
       {{ form.submit(class="btn btn-primary btn-user btn-block") }}
     </form>
   </div>
   <div class="col-xl-6 mb-4" id="fadeMatrix">
+    {% if authors_matrix%}
     <h2 class="h4 mb-2 text-gray-800">
       Some of your authors...
     </h2>
@@ -91,7 +100,12 @@
       </div>
       {% endfor %}
     </div>
-    {% endfor %}
+    {% endfor %} {% else %}
+    <h2 class="h4 mb-2 text-gray-800">
+      No authors yet!
+    </h2>
+    <p>Way to go! Start adding your authors!!</p>
+    {% endif %}
   </div>
 </div>
 

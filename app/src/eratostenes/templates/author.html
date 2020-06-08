@@ -56,7 +56,9 @@
                 >Modify</span
               ></a
             >
-            <a class="dropdown-item" href="#"
+            <a
+              class="dropdown-item"
+              href="/book/add?by_author={{author.AuthorID}}"
               ><i class="fas fa-book text-gray-300"></i> &nbsp;<span>
                 Add book</span
               ></a
@@ -68,6 +70,17 @@
                 >Share</span
               ><span class="badge badge-danger badge-counter"
                 >Coming soon!</span
+              ></a
+            >
+            <div class="dropdown-divider"></div>
+            <div class="dropdown-header">Delete</div>
+            <a
+              class="dropdown-item"
+              href="#"
+              data-toggle="modal"
+              data-target="#deleteModal{{author.AuthorID}}"
+              ><i class="fas fa-trash text-gray-300"></i> &nbsp;<span
+                >Delete</span
               ></a
             >
           </div>
@@ -140,6 +153,53 @@
     </div>
   </div>
 </div>
+
+<!--
+DELETE MODAL START
+-->
+<!-- Modal -->
+<div
+  class="modal fade"
+  id="deleteModal{{author.AuthorID}}"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="deleteModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel">
+          Delete {{ author.FullName }}
+        </h5>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to delete {{author.FullName}} and all its
+        associated books and quotes? This action is irreversible.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+          Cancel
+        </button>
+
+        <a href="/author/{{author.AuthorID}}/delete" class="btn btn-danger">
+          <i class="fa fa-trash"></i> &nbsp; Delete
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+<!--
+DELETE MODAL END
+-->
 {%endfor%} {% endblock %}{% block script %}
 
 <script>

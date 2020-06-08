@@ -22,11 +22,11 @@ var elementList = document
   .getElementById("fadeMatrix")
   .getElementsByTagName("img");
 
-var indexList = shuffle([0, 1, 2, 3, 4, 5, 6, 7, 8]);
+var indexList = shuffle(Array.from(new Array(elementList.length), (x, i) => i));
 
 for (var i = 0; i < elementList.length; i++) {
   var index = indexList.pop();
-  (function(i) {
+  (function (i) {
     var timeToStartFade = 1700 * i;
     setTimeout(fadePictureInOut(index), timeToStartFade);
   })(i);

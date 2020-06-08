@@ -7,6 +7,7 @@ from flask import flash, jsonify, render_template, redirect, request, session, u
 from sqlalchemy.sql import func
 from functools import wraps
 from hmac import compare_digest as compare_hash
+import os
 
 
 #######################################################################
@@ -69,9 +70,8 @@ def get_3by3_matrix(entity, user_id, filter_by=None):
     else: # if an author is provided
         data = entity.query.filter((entity.UserID == user_id) & (entity.Author.any(AuthorID = filter_by.AuthorID))).order_by(
             func.rand()).limit(9).all()
-    matrix = [list(data[i:i+3]) for i in [0, 3, 6]]
-    #app.logger.info(matrix)
-    return matrix
+    return [list(data[i:i+3]) for i in [0, 3, 6]] if data else None
+    
 
 #######################################################################
 # Routes
@@ -137,6 +137,7 @@ def author_add_route():
             # Update database with new filename
             new_author.PicturePath = new_filename
             db.session.commit()
+            # TODO: Implement logic to continue adding authors if checkbox enabled
         return redirect(f"/author/{author_id}")          
     authors_matrix = get_3by3_matrix(Author, session['user']['UserID'])
     return render_template('author_add.html', title="Add Author", form=form, authors_matrix = authors_matrix, error=error)
@@ -157,13 +158,39 @@ def author_list_route():
 #######################################################################
 
 
-@app.route('/author/<int:author_id>')
+@app.route('/author/<int:author_id>', methods=['GET'])
 @requires_auth
 def author_route(author_id):
     """Renders Author with AuthorID equal to author_id for the logged user"""
     author = Author.query.filter((Author.AuthorID == author_id) & (
-        Author.UserID == session['user']['UserID'])).one()
-    return render_template('author.html', title=author.FullName, authors=[author, ])
+        Author.UserID == session['user']['UserID'])).first()
+    if author is not None:
+        return render_template('author.html', title=author.FullName, authors=[author, ])
+    else:
+        return redirect('/') # TODO: Show not found.
+
+#######################################################################
+#       Delete Author by ID
+#######################################################################
+
+
+@app.route('/author/<int:author_id>/delete', methods=['GET'])
+@requires_auth
+def author_delete_route(author_id):
+    """Renders Author with AuthorID equal to author_id for the logged user"""
+    author = Author.query.filter((Author.AuthorID == author_id) & (
+        Author.UserID == session['user']['UserID'])).first()
+    if author is not None: # Delete resources and DB Entry.
+        if author.PicturePath is not None: # Delete picture if any
+            os.remove(f'{app.config["UPLOAD_FOLDER"]}/authors/{author.PicturePath}')
+        db.session.delete(author)
+        db.session.commit()
+        flash(f'Author {author.FullName} and associated books and quotes have been succesfully deleted', 'success')
+        return redirect('/') # TODO: Testing for children deletion.
+    else:
+        return redirect('/') # TODO: Show not found.
+
+
 
 
 #######################################################################
@@ -203,6 +230,8 @@ def book_add_route():
     # If a valid form is received
     if form.validate_on_submit():
         #TODO: Add book to database and upload picture
+
+        #TODO: Implement logic to continue adding books if checkbox enabled
         return True
     books_matrix = get_3by3_matrix(Book, session['user']['UserID'], author)
     return render_template('book_add.html', title="Add Book", form=form, books_matrix = books_matrix, author=author)

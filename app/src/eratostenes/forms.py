@@ -34,6 +34,7 @@ class AuthorForm(FlaskForm):
     notes = TextAreaField('Notes')
     picture = FileField('Picture', validators=[
                         FileAllowed(app.config['ALLOWED_EXTENSIONS'], 'Image format not supported, allowed extensions are ' + ', '.join(app.config['ALLOWED_EXTENSIONS']))])
+    keep_adding = BooleanField('Continue adding authors')
     submit = SubmitField('Submit')
 
 
@@ -49,6 +50,7 @@ class BookForm(FlaskForm):
     notes = TextAreaField('Notes')
     picture = FileField('Picture', validators=[
                         FileAllowed(app.config['ALLOWED_EXTENSIONS'], 'Image format not supported, allowed extensions are ' + ', '.join(app.config['ALLOWED_EXTENSIONS']))])
+    keep_adding = BooleanField('Continue adding books for the same Author(s)')
     submit = SubmitField('Submit')
 
 class QuoteForm(FlaskForm):

@@ -88,11 +88,25 @@
         <label for="picture">Picture</label>
         {{ form.picture(class="form-control-file") }}
       </div>
+
+      <div class="form-group">
+        <label for="notes">Notes</label>
+        {{ form.notes(class="form-control", placeholder="Notes") }}
+      </div>
+      <div class="form-group">
+        <div class="custom-control custom-checkbox small">
+          {{ form.keep_adding(class="custom-control-input") }}
+          <label class="custom-control-label" for="keep_adding"
+            >Continue adding books from the same author(s) after submitting.</label
+          >
+        </div>
+      </div>
       {{ form.submit(class="btn btn-primary btn-user btn-block")
       }}
     </form>
   </div>
   <div class="col-xl-6 mb-4" id="fadeMatrix">
+    {% if books_matrix %}
     <h2 class="h4 mb-2 text-gray-800">
       Some of your {{ author.FullName + "'s" if author else ''}} books...
     </h2>
@@ -112,6 +126,12 @@
       {% endfor %}
     </div>
     {% endfor %}
+    {% else %}
+    <h2 class="h4 mb-2 text-gray-800">
+      No books {{ "from " + author.FullName if author else ''}} yet...
+    </h2>
+    Way to go! Start adding your books!
+    {% endif %}
   </div>
 </div>
 

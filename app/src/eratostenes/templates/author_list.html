@@ -78,7 +78,9 @@
                   >Modify</span
                 ></a
               >
-              <a class="dropdown-item" href="#"
+              <a
+                class="dropdown-item"
+                href="/book/add?by_author={{author.AuthorID}}"
                 ><i class="fas fa-book text-gray-300"></i> &nbsp;<span>
                   Add book</span
                 ></a
@@ -114,7 +116,7 @@
 <!-- Page level custom scripts -->
 <script>
   // Call the dataTables jQuery plugin
-  $(document).ready(function() {
+  $(document).ready(function () {
     $("#dataTable").DataTable();
   });
 </script>
