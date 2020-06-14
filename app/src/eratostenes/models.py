@@ -107,6 +107,11 @@ class Book(db.Model):
     @property
     def Authors(self):
         return len(self.Author)
+    
+
+    @property
+    def Genres(self):
+        return len(self.Genre)
 
     @property
     def AuthorName(self):
@@ -115,6 +120,11 @@ class Book(db.Model):
             return names_list[0]
         else:
             return ', '.join(names_list[:-1]) + ' and ' + names_list[-1]
+    
+    @property
+    def GenreName(self):
+        genres_list = [genre.GenreName for genre in self.Genre]
+        return ', '.join(genres_list)
 
     def to_dict(self):
         return {'BookID': self.BookID,

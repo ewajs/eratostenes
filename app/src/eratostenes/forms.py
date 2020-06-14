@@ -2,13 +2,16 @@ from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, DateField, TextAreaField, SelectMultipleField, IntegerField, SelectField
 from wtforms.validators import DataRequired, Optional, Email, Length
-from wtforms.ext.sqlalchemy.fields import QuerySelectField
-from eratostenes.models import Country
+from wtforms.ext.sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
+from eratostenes.models import Country, Genre
 from eratostenes import app
 
 
 def possible_countries():
     return Country.query
+
+def possible_genres():
+    return Genre.query
 
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
@@ -42,13 +45,13 @@ class BookForm(FlaskForm):
     title = StringField('Title', validators=[DataRequired()])
     subtitle = StringField('Subtitle')
     pages = IntegerField('Pages', validators=[DataRequired()])
-    publication_date = DateField('Publication Date', format='%d/%m/%Y', validators=[Optional()])
-    authors = SelectMultipleField('Author(s)', validators=[DataRequired()])
-    genres = SelectMultipleField('Genre(s)')
+    publication_date = DateField('Publication Date', format='%Y-%m-%d', validators=[Optional()])
+    authors = QuerySelectMultipleField('Author(s)', get_label='FullName', allow_blank=False)
+    genres = QuerySelectMultipleField('Genre(s)', query_factory=possible_genres, get_label='GenreName', allow_blank=False)
     isbn = StringField('ISBN')
     blurb = TextAreaField('Blurb')
     notes = TextAreaField('Notes')
-    picture = FileField('Picture', validators=[
+    picture = FileField('Cover', validators=[
                         FileAllowed(app.config['ALLOWED_EXTENSIONS'], 'Image format not supported, allowed extensions are ' + ', '.join(app.config['ALLOWED_EXTENSIONS']))])
     keep_adding = BooleanField('Continue adding books for the same Author(s)')
     submit = SubmitField('Submit')

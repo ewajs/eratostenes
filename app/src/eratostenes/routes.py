@@ -5,6 +5,7 @@ from eratostenes import db
 from eratostenes.models import User, Book, Author, Quote, Country, Genre
 from flask import flash, jsonify, render_template, redirect, request, session, url_for
 from sqlalchemy.sql import func
+from sqlalchemy.orm.exc import NoResultFound
 from functools import wraps
 from hmac import compare_digest as compare_hash
 import os
@@ -128,7 +129,7 @@ def author_add_route():
         db.session.add(new_author)
         db.session.commit()
         author_id = new_author.AuthorID
-        app.logger.debug(f"AuthorID: {author_id}")
+        app.logger.debug(f"Added Author with AuthorID: {author_id}")
         if form.picture.data is not None:
             # Picture was submitted, save with convention
             ext = get_extension(form.picture.data.filename)
@@ -167,7 +168,7 @@ def author_route(author_id):
     if author is not None:
         return render_template('author.html', title=author.FullName, authors=[author, ])
     else:
-        return redirect('/') # TODO: Show not found.
+        return render_template('404.html', title='Author not found', resource_kind='Author'), 404
 
 #######################################################################
 #       Delete Author by ID
@@ -211,30 +212,55 @@ def author_book_route(author_id):
 #   Book Subroutes
 #######################################################################
 
-@app.route('/book/add')
+@app.route('/book/add', methods=['GET', 'POST'])
 @requires_auth
 def book_add_route():
     """Serves the add book page"""
+    author_by = None
+    form = BookForm()
+    # Load only this user's Authors (Genres come preloaded as they are global)
+    form.authors.query = Author.query.filter(Author.UserID == session['user']['UserID']).order_by(Author.LastName.asc())
     if request.method == 'GET':
         # if the by_author parameter is set, add a book by that author.
         author_id = request.values.get('by_author')
         if author_id is not None:
-            author = Author.query.filter(Author.AuthorID == author_id and Author.UserID == session['user']['UserID']).one()
-        else:
-            author = None
-
-    form = BookForm()
-    form.authors.choices = [(author.AuthorID, author.FullName) for author in Author.query.filter(Author.UserID == session['user']['UserID']).all()]
-    form.genres.choices = [(genre.GenreID, genre.GenreName) for genre in Genre.query.all()]
-    
+            try:
+                author_by = Author.query.filter(Author.AuthorID == author_id and Author.UserID == session['user']['UserID']).one()
+                form.authors.default = (author_by, )
+                form.process()
+            except NoResultFound:
+                return redirect(f'/author/{author_id}')
     # If a valid form is received
     if form.validate_on_submit():
-        #TODO: Add book to database and upload picture
-
-        #TODO: Implement logic to continue adding books if checkbox enabled
-        return True
-    books_matrix = get_3by3_matrix(Book, session['user']['UserID'], author)
-    return render_template('book_add.html', title="Add Book", form=form, books_matrix = books_matrix, author=author)
+       # Create the Book and add to DB
+        new_book = Book(Title=form.title.data, 
+                        Subtitle=form.subtitle.data,
+                        Pages=form.pages.data,
+                        PublicationDate=form.publication_date.data,
+                        ISBN=form.isbn.data,
+                        Blurb=form.blurb.data,
+                        Notes=form.notes.data,
+                        UserID=session['user']['UserID'])
+        for genre in form.genres.data:
+            new_book.Genre.append(genre)
+        for author in form.authors.data:
+            new_book.Author.append(author)
+        db.session.add(new_book)
+        db.session.commit()
+        book_id = new_book.BookID
+        app.logger.debug(f"Added Book with BookID: {book_id}")
+        if form.picture.data is not None:
+            # Picture was submitted, save with convention
+            ext = get_extension(form.picture.data.filename)
+            new_filename = f"c{book_id}.{ext}"
+            form.picture.data.save(f"{app.config['UPLOAD_FOLDER']}/covers/{new_filename}") 
+            # Update database with new filename
+            new_book.CoverPath = new_filename
+            db.session.commit()
+            # TODO: Implement logic to continue adding authors if checkbox enabled
+        return redirect(f"/book/{book_id}")         
+    books_matrix = get_3by3_matrix(Book, session['user']['UserID'], author_by)
+    return render_template('book_add.html', title="Add Book", form=form, books_matrix = books_matrix, author=author_by)
 
 
 #######################################################################
@@ -257,9 +283,11 @@ def book_list_route():
 def book_route(book_id):
     """Renders Book with BookID equal to book_id for the logged user"""
     book = Book.query.filter((Book.BookID == book_id) & (
-        Author.UserID == session['user']['UserID'])).one()
-    app.logger.info(book.Quotes)
-    return render_template('book.html', title=book.Title, books=[book, ])
+        Author.UserID == session['user']['UserID'])).first()
+    if book is not None:
+        return render_template('book.html', title=book.Title, books=[book, ])
+    else:
+        return render_template('404.html', title='Book not found', resource_kind='Book'), 404
 
 #######################################################################
 #       Author(s) of Book by ID

@@ -86,15 +86,22 @@
                     <th>Title</th>
                     <td>{{ book.Title | safe }}</td>
                   </tr>
+                  {% if book.Subtitle %}
                   <tr>
                     <th>Subtitle</th>
                     <td>{{ book.Subtitle | safe }}</td>
                   </tr>
+                  {% endif %}
                   <tr>
-                    <th>Author</th>
+                    <th>Author{{ 's' if book.Authors > 1 else '' }}</th>
                     <td>{{ book.AuthorName | safe }}</td>
                   </tr>
-
+                  {% if book.Genres != 0 %}
+                  <tr>
+                    <th>Genre{{ 's' if book.Genres > 1 else '' }}</th>
+                    <td>{{ book.GenreName | safe }}</td>
+                  </tr>
+                  {% endif %}
                   <tr>
                     <th>Quotes</th>
                     <td>{{ book.Quotes }}</td>
@@ -105,7 +112,7 @@
                     <td>{{ book.Pages }}</td>
                   </tr>
                   <tr>
-                    <th style="width: 20%">Publication Date</th>
+                    <th style="width: 20%;">Publication Date</th>
                     <td>{{ book.PublicationDate }}</td>
                   </tr>
                   <tr>
@@ -131,7 +138,7 @@
                 <img
                   width="100%"
                   class="img-profile rounded-lg"
-                  src="{{ url_for('static', filename='img/covers/'+ book.CoverPath)}}"
+                  src="{{ url_for('static', filename='img/covers/'+ (book.CoverPath if book.CoverPath else 'empty.png')) }}"
                   data-toggle="tooltip"
                   data-placement="top"
                   title="{{ book.Title }}"
@@ -147,7 +154,7 @@
 {% endfor %} {% endblock %}{% block script %}
 
 <script>
-  $(function() {
+  $(function () {
     $('[data-toggle="tooltip"]').tooltip();
   });
 </script>
